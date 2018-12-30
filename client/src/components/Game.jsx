@@ -8,6 +8,8 @@ class Game extends React.Component{
         this.state={
             player1: 1,
             player2: 2,
+            name1:null,
+            name2:null,
             board:[],
             currentPlayer: null,
             gameOver: false,
@@ -15,6 +17,11 @@ class Game extends React.Component{
 
         }
         this.playGame = this.playGame.bind(this)
+    }
+
+    componentDidMount(){
+      this.createPlayer();
+       console.log(this.state)
     }
 
     createBoard(){
@@ -27,19 +34,52 @@ class Game extends React.Component{
             board.push(row);
         }
         this.setState({
-            board: board
+            board: board,
+            currentPlayer: this.state.player1,
+            gameOver: false,
+            message:''
         })
-        console.log(this.state.board)
+        // console.log(this.state.board)
     }
 
+    //create player based on user prompt
+    createPlayer(){
+      let playerName = window.prompt('Name your player');
+      if(this.state.name1 === null){
+        this.setState({
+          name1: playerName
+        })
+      } else if (this.state.name2 === null){
+        this.setState({
+          name2: playerName
+        })
+      }
+  }
 
-    togglePlayer() {
-              return (this.state.currentPlayer === this.state.player1) ? this.state.player2 : this.state.player1;
+  //checkPlayer name to determine winner, if undefined will return default name
+  checkName(name){
+    if(name === null && this.state.name1 === null){
+      return 'player 1'
+    }
+    if(name === null && this.state.name2 === null){
+      return 'player 2'
+    } else {
+      return name;
+    }
+  }
+
+    //change player dependendent on who went last
+    togglePlayer(){
+              if(this.state.currentPlayer === this.state.player1){
+                return this.state.player2
+              } else{
+                return this.state.player1
             }
+    }
 
     //core gameplay functionality and board check implementation
     playGame(c) {
-            console.log('Ive been clicked', this.state.board)
+            console.log('Ive been clicked', this.state)
       if (!this.state.gameOver) {
         let board = this.state.board;
         for (let r = 5; r >= 0; r--) {
@@ -48,29 +88,27 @@ class Game extends React.Component{
             break;
           }
         }
-        let result = this.checkAll(board);
+        let result = this.checkBoard(board);
         if (result === this.state.player1) {
-          this.setState({ board, gameOver: true, message: 'Red wins!' });
+          this.setState({ board, gameOver: true, message: `${this.checkName(this.state.name1)} wins!` });
         } else if (result === this.state.player2) {
-          this.setState({ board, gameOver: true, message: 'Blue wins!' });
+          this.setState({ board, gameOver: true, message: `${this.checkName(this.state.name2)} wins!` });
         } else if (result === 'draw') {
-          this.setState({ board, gameOver: true, message: 'Draw game.' });
+          this.setState({ board, gameOver: true, message: 'Draw!' });
         } else {
           this.setState({ board, currentPlayer: this.togglePlayer() });
         }
       } else {
-        this.setState({ message: 'Game over. Please start a new game.' });
+        this.setState({ message: 'Game over! Press new game to restart!' });
       }
     }
 
 
-    checkVertical(board) {
+    handleVertical(board) {
       for (let r = 3; r < 6; r++) {
         for (let c = 0; c < 7; c++) {
           if (board[r][c]) {
-            if (board[r][c] === board[r - 1][c] &&
-                board[r][c] === board[r - 2][c] &&
-                board[r][c] === board[r - 3][c]) {
+            if (board[r][c] === board[r - 1][c] && board[r][c] === board[r - 2][c] && board[r][c] === board[r - 3][c]) {
               return board[r][c];    
             }
           }
@@ -79,13 +117,11 @@ class Game extends React.Component{
     }
 
 
-        checkHorizontal(board) {
+        handleHorizontal(board) {
       for (let r = 0; r < 6; r++) {
         for (let c = 0; c < 4; c++) {
           if (board[r][c]) {
-            if (board[r][c] === board[r][c + 1] && 
-                board[r][c] === board[r][c + 2] &&
-                board[r][c] === board[r][c + 3]) {
+            if (board[r][c] === board[r][c + 1] && board[r][c] === board[r][c + 2] && board[r][c] === board[r][c + 3]) {
               return board[r][c];
             }
           }
@@ -94,13 +130,11 @@ class Game extends React.Component{
     }
 
 
-        checkDiagonalRight(board) {
+        handleDiagonalRight(board) {
       for (let r = 3; r < 6; r++) {
         for (let c = 0; c < 4; c++) {
           if (board[r][c]) {
-            if (board[r][c] === board[r - 1][c + 1] &&
-                board[r][c] === board[r - 2][c + 2] &&
-                board[r][c] === board[r - 3][c + 3]) {
+            if (board[r][c] === board[r - 1][c + 1] && board[r][c] === board[r - 2][c + 2] && board[r][c] === board[r - 3][c + 3]) {
               return board[r][c];
             }
           }
@@ -109,13 +143,11 @@ class Game extends React.Component{
     }
 
 
-        checkDiagonalLeft(board) {
+        handleDiagonalLeft(board) {
       for (let r = 3; r < 6; r++) {
         for (let c = 3; c < 7; c++) {
           if (board[r][c]) {
-            if (board[r][c] === board[r - 1][c - 1] &&
-                board[r][c] === board[r - 2][c - 2] &&
-                board[r][c] === board[r - 3][c - 3]) {
+            if (board[r][c] === board[r - 1][c - 1] && board[r][c] === board[r - 2][c - 2] && board[r][c] === board[r - 3][c - 3]) {
               return board[r][c];
             }
           }
@@ -123,7 +155,7 @@ class Game extends React.Component{
       }
     }
 
-        checkDraw(board) {
+        handleDraw(board) {
       for (let r = 0; r < 6; r++) {
         for (let c = 0; c < 7; c++) {
           if (board[r][c] === null) {
@@ -134,8 +166,8 @@ class Game extends React.Component{
       return 'draw';    
     }
     
-    checkAll(board) {
-      return this.checkVertical(board) || this.checkDiagonalRight(board) || this.checkDiagonalLeft(board) || this.checkHorizontal(board) || this.checkDraw(board);
+    checkBoard(board) {
+      return this.handleVertical(board) || this.handleDiagonalRight(board) || this.handleDiagonalLeft(board) || this.handleHorizontal(board) || this.handleDraw(board);
     }
 
     render(){
@@ -146,9 +178,9 @@ class Game extends React.Component{
                 </div>
                 <button onClick={() => {this.createBoard()}}>New Game</button>
                 <table>
-                <div>
+                <tbody>
                 {this.state.board.map((row, i) => (<Board row={row} key={i} play={this.playGame}/>))}
-                </div>
+                </tbody>
                 </table>
                 <p>{this.state.message}</p>
             </div>
