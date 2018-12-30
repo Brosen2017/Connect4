@@ -1,0 +1,17 @@
+.header{
+    display: flex;
+    height: 150px;
+    padding: 10px;
+    background:black;
+  }
+  
+  .text{
+    margin-top:15px;
+    font-size: 100px;  
+    color:white;
+    text-decoration: underline blue;
+  }
+
+  .extra{
+      color:red;
+  }

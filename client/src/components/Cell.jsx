@@ -1,4 +1,6 @@
 import React from 'react';
+import styles from '../styles/Cell.css';
+
 
 let Cell = props =>{
     let color = 'white';
@@ -9,10 +11,11 @@ let Cell = props =>{
     }
 
     return(
+        <td>
     <div>
-        {props.cell}
-        <button onClick={() => {props.play(props.index)}}>{color}</button>
+        <button className={styles.cell} onClick={() => {props.play(props.index)}}>{color}</button>
     </div>
+    </td>
 )
     }
 
