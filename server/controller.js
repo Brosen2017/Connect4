@@ -5,39 +5,49 @@ exports.get = (req,res)=>{
 }
 
 exports.patch = (req,res)=>{
-    console.log('player wins', req.body.user.wins)
-    db.Player.findOne({
-       Username: req.body.user.name 
-    }, (err, data)=>{
+    console.log('player', req.body.user.name)
+    db.Player.update(
+        {Username: req.body.user.name}, 
+        {Wins: req.body.user.wins},{ upsert: true },(err,data)=>{
         if(err){
-            console.log(err)
+            throw(err)
         } else {
-            if(!data.Username){
-                // console.log('not new')
-                new db.Player({
-                    Username: req.body.user.name,
-                    Wins: req.body.user.wins 
-                }).save((err, data)=>{
-                    if(err){
-                        console.log(err)
-                    } else {
-                        res.status(200).send(data)
-                    }
-                })
-            } else if(data.Username === req.body.user.name){
-                // console.log('in update')
-                db.Player.update(
-                    {Username: req.body.user.name}, 
-                    {$set:{Wins: req.body.user.wins}},(err,data)=>{
-                        if(err){
-                            throw(err)
-                        } else {
-                            res.status(201).send(data)
-                            console.log('updated')
-                        }
-                    })
-                } 
-            }
-        })
-}
+            res.status(200).send(data)
+            console.log('updated')
+        }
+    })
+} 
+    // db.Player.find({
+    //    Username: req.body.user.name 
+    // }, (err, data)=>{
+    //     if(err){
+    //         throw(err)
+    //     } else if(!data[0].Username){
+    //              console.log('new', data)
+    //             new db.Player({
+    //                 Username: req.body.user.name,
+    //                 Wins: req.body.user.wins 
+    //             }).save((err, data)=>{
+    //                 if(err){
+    //                     throw(err)
+    //                 } else {
+    //                     res.status(200).send(data)
+    //                 }
+    //             })
+    //         } else if(data.Username === req.body.user.name){
+    //              console.log('in update')
+    //             db.Player.update(
+    //                 {Username: req.body.user.name}, 
+    //                 {$set:{Wins: req.body.user.wins}},(err,data)=>{
+    //                     if(err){
+    //                         throw(err)
+    //                     } else {
+    //                         res.status(201).send(data)
+    //                         console.log('updated')
+    //                     }
+    //                 })
+    //             } 
+    //         })
+
+
 

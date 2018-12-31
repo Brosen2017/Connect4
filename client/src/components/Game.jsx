@@ -113,8 +113,9 @@ class Game extends React.Component{
         this.setState({
           wins1: (this.state.wins1 + 1)
         })
+        let name = this.checkName(this.state.name1)
         let user = {
-          name: this.state.name1,
+          name: name,
           wins: this.state.wins1
         }
         axios
@@ -127,8 +128,10 @@ class Game extends React.Component{
         this.setState({
           wins2: this.state.wins2 + 1
         })
+        let name = this.checkName(this.state.name2)
+        console.log('name', name)
         let user = {
-          name: this.state.name2,
+          name: name,
           wins: this.state.wins2
         }
         axios
