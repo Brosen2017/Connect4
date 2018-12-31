@@ -17,4 +17,4 @@ Wins: Number
 
 let Player = mongoose.model('Player', PlayerBase);
 
-module.exports = Player;
+module.exports.Player = Player;

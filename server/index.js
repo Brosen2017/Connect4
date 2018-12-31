@@ -3,6 +3,7 @@ const parser = require('body-parser');
 const http = require('http');
 const path = require('path');
 const Axios = require('axios');
+const router = require("./router.js");
 const socket = require('socket.io');
 
 const app = express();
@@ -18,9 +19,7 @@ app.use(parser.urlencoded({extended: true}))
 
 app.use(express.static(path.join(__dirname, '/../client/dist')));
 
-app.get('/player', (req,res)=>{
-    console.log('in get')
-})
+app.use("/", router);
 
 app.listen(PORT, function(){
     console.log(`successfully listening on ${PORT}!`)

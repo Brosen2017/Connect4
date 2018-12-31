@@ -1,6 +1,7 @@
 import React from 'react';
 import Board from './Board.jsx';
 import styles from '../styles/Game.css';
+import axios from 'axios';
 
 class Game extends React.Component{
     constructor(props){
@@ -10,6 +11,8 @@ class Game extends React.Component{
             player2: 2,
             name1:null,
             name2:null,
+            wins1:1,
+            wins2:1,
             board:[],
             currentPlayer: null,
             gameOver: false,
@@ -39,7 +42,7 @@ class Game extends React.Component{
             gameOver: false,
             message:''
         })
-        // console.log(this.state.board)
+         console.log(this.state)
     }
 
     //create player based on user prompt
@@ -90,9 +93,11 @@ class Game extends React.Component{
         }
         let result = this.checkBoard(board);
         if (result === this.state.player1) {
-          this.setState({ board, gameOver: true, message: `${this.checkName(this.state.name1)} wins!` });
+          this.handleWins(this.state.player1);
+          this.setState({ board, gameOver: true, message: `${this.checkName(this.state.name1)} (red) wins!` });
         } else if (result === this.state.player2) {
-          this.setState({ board, gameOver: true, message: `${this.checkName(this.state.name2)} wins!` });
+          this.handleWins(this.state.player2);
+          this.setState({ board, gameOver: true, message: `${this.checkName(this.state.name2)} (blue) wins!` });
         } else if (result === 'draw') {
           this.setState({ board, gameOver: true, message: 'Draw!' });
         } else {
@@ -100,6 +105,38 @@ class Game extends React.Component{
         }
       } else {
         this.setState({ message: 'Game over! Press new game to restart!' });
+      }
+    }
+
+    handleWins(player){
+      if(player === this.state.player1){
+        this.setState({
+          wins1: (this.state.wins1 + 1)
+        })
+        let user = {
+          name: this.state.name1,
+          wins: this.state.wins1
+        }
+        axios
+        .patch('/player', {user})
+        .then((res)=>{
+          console.log(res.data)
+        })
+        .catch(err=>console.log(err));
+      } else if(player === this.state.player2){
+        this.setState({
+          wins2: this.state.wins2 + 1
+        })
+        let user = {
+          name: this.state.name2,
+          wins: this.state.wins2
+        }
+        axios
+        .patch('/player', {user})
+        .then((res)=>{
+          console.log(res.data)
+        })
+        .catch(err=>console.log(err));
       }
     }
 
