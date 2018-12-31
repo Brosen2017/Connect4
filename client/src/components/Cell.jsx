@@ -13,7 +13,7 @@ let Cell = props =>{
     return(
         <td>
     <div>
-        <button className={styles.cell} onClick={() => {props.play(props.index)}}>{color}</button>
+        <button style={{'background-color': color}} className={styles.cell} onClick={() => {props.play(props.index)}}></button>
     </div>
     </td>
 )

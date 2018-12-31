@@ -1,5 +1,6 @@
 import React from 'react';
 import Board from './Board.jsx';
+import Score from './Score.jsx';
 import styles from '../styles/Game.css';
 import axios from 'axios';
 
@@ -16,6 +17,7 @@ class Game extends React.Component{
             board:[],
             currentPlayer: null,
             gameOver: false,
+            highScore:[],
             message: ''
 
         }
@@ -25,6 +27,14 @@ class Game extends React.Component{
     componentDidMount(){
       this.createPlayer();
        console.log(this.state)
+      axios
+      .get('/player')
+      .then((res)=>{
+        this.setState({
+          highScore: res.data
+        })
+      })
+      .catch(err=>console.log(err))
     }
 
     createBoard(){
@@ -61,10 +71,10 @@ class Game extends React.Component{
 
   //checkPlayer name to determine winner, if undefined will return default name
   checkName(name){
-    if(name === null && this.state.name1 === null){
+    if(name === null && this.state.name1 === null || name === ''){
       return 'player 1'
     }
-    if(name === null && this.state.name2 === null){
+    if(name === null && this.state.name2 === null || name === ''){
       return 'player 2'
     } else {
       return name;
@@ -108,6 +118,7 @@ class Game extends React.Component{
       }
     }
 
+    //keep track of current wins per player and update database per win based on username and win
     handleWins(player){
       if(player === this.state.player1){
         this.setState({
@@ -129,7 +140,6 @@ class Game extends React.Component{
           wins2: this.state.wins2 + 1
         })
         let name = this.checkName(this.state.name2)
-        console.log('name', name)
         let user = {
           name: name,
           wins: this.state.wins2
@@ -210,6 +220,7 @@ class Game extends React.Component{
       return this.handleVertical(board) || this.handleDiagonalRight(board) || this.handleDiagonalLeft(board) || this.handleHorizontal(board) || this.handleDraw(board);
     }
 
+
     render(){
         return(
             <div>
@@ -217,12 +228,20 @@ class Game extends React.Component{
                 <h1 className={styles.text}>C<span className={styles.extra}>o</span>nnect F<span className={styles.extra}>o</span>ur!</h1>
                 </div>
                 <button onClick={() => {this.createBoard()}}>New Game</button>
+                <div className={styles.main}>
                 <table>
                 <tbody>
                 {this.state.board.map((row, i) => (<Board row={row} key={i} play={this.playGame}/>))}
                 </tbody>
                 </table>
+                <div className={styles.score}>
+                <h1>High Score</h1>
+                <div className={styles.list}>
+                  {this.state.highScore.map((score, i)=><Score score={score} key={i}/>)}
+                  </div>
+                </div>
                 <p>{this.state.message}</p>
+                </div>
             </div>
         )
     }
