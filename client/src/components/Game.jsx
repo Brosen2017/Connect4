@@ -2,7 +2,7 @@ import React from 'react';
 import Board from './Board.jsx';
 import Score from './Score.jsx';
 import styles from '../styles/Game.css';
-import {joinGame, playPiece, updateBoard} from '../socket.js'
+import {joinGame, playPiece, updateBoard, retrieveBoard} from '../socket.js'
 import axios from 'axios';
 
 class Game extends React.Component{
@@ -19,7 +19,8 @@ class Game extends React.Component{
             currentPlayer: null,
             gameOver: false,
             highScore:[],
-            message: ''
+            message: '',
+            test: true
 
         }
         this.playGame = this.playGame.bind(this)
@@ -35,6 +36,12 @@ class Game extends React.Component{
       this.createPlayer();
       this.createBoard();
       this.handleScore();
+      retrieveBoard((b)=>{
+        console.log('this is the updated board', b)
+        this.setState({
+            board: b
+        })
+      })
     }
 
     createBoard(){
@@ -70,19 +77,19 @@ class Game extends React.Component{
     //create player based on user prompt
     createPlayer(){
       let playerName = window.prompt('Name your player');
-      joinGame(playerName, ()=>{
-        // playerName = window.prompt('Name taken please try something else');
-        console.log('in the callback baby')
-      });
-      if(this.state.name1 === null){
+      joinGame(playerName, (p)=>{
+      if(p === "taken"){
+        return playerName = window.prompt('Name taken please try something else');
+      } else if(this.state.name1 === null){
         this.setState({
-          name1: playerName
+          name1: p
         })
       } else if (this.state.name2 === null){
         this.setState({
-          name2: playerName
+          name2: p
         })
       }
+    });
   }
 
   //checkPlayer name to determine winner, if undefined will return default name
@@ -106,13 +113,14 @@ class Game extends React.Component{
             }
     }
 
+    show(){
+      console.log('current state', this.state)
+    }
+
 
     //core gameplay functionality and board check implementation
     playGame(c) {
-      console.log(playPiece(c, this.state.currentPlayer));
-      //console.log(updateBoard(this.state.board))
       if (!this.state.gameOver) {
-        //let board = updateBoard(this.state.board)
         let board = this.state.board;
         for (let r = 5; r >= 0; r--) {
           if (!board[r][c]) {
@@ -120,6 +128,8 @@ class Game extends React.Component{
             break;
           }
         }
+        this.setState({ board, currentPlayer: this.togglePlayer() });
+        updateBoard(this.state.board)
         let result = this.checkBoard(board);
         if (result === this.state.player1) {
           this.handleWins(this.state.player1);
@@ -132,9 +142,6 @@ class Game extends React.Component{
         if (result === 'draw') {
           this.setState({ board, gameOver: true, message: 'Draw!' });
         } 
-        {
-          this.setState({ board, currentPlayer: this.togglePlayer() });
-        }
       } else {
         this.setState({ message: 'Game over! Press new game to restart!' });
       }
@@ -250,6 +257,7 @@ class Game extends React.Component{
                 <h1 className={styles.text}>C<span className={styles.extra}>o</span>nnect F<span className={styles.extra}>o</span>ur!</h1>
                 </div>
                 <button onClick={() => {this.createBoard()}}>New Game</button>
+                <button onClick={()=>{this.show()}}>show state</button>
                 <div className={styles.main}>
                 <table>
                 <tbody>
