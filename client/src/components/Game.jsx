@@ -2,7 +2,7 @@ import React from 'react';
 import Board from './Board.jsx';
 import Score from './Score.jsx';
 import styles from '../styles/Game.css';
-import {subscribeToTimer} from '../socket.js'
+import {joinGame, playPiece, updateBoard} from '../socket.js'
 import axios from 'axios';
 
 class Game extends React.Component{
@@ -70,7 +70,10 @@ class Game extends React.Component{
     //create player based on user prompt
     createPlayer(){
       let playerName = window.prompt('Name your player');
-      subscribeToTimer(playerName);
+      joinGame(playerName, ()=>{
+        // playerName = window.prompt('Name taken please try something else');
+        console.log('in the callback baby')
+      });
       if(this.state.name1 === null){
         this.setState({
           name1: playerName
@@ -103,10 +106,13 @@ class Game extends React.Component{
             }
     }
 
+
     //core gameplay functionality and board check implementation
     playGame(c) {
-            console.log('Ive been clicked', this.state)
+      console.log(playPiece(c, this.state.currentPlayer));
+      //console.log(updateBoard(this.state.board))
       if (!this.state.gameOver) {
+        //let board = updateBoard(this.state.board)
         let board = this.state.board;
         for (let r = 5; r >= 0; r--) {
           if (!board[r][c]) {
