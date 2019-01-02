@@ -18,6 +18,21 @@
 
   .main{
     display:flex;
+    justify-content: center;
+  }
+
+  .highScore{
+    font-family: 'Bungee Shade', cursive;
+    font-size: 50px;
+    color:white;
+    margin-top: -10px;
+    margin-bottom: -10px;
+    margin-left: 10px;
+    margin-right: 10px;
+  }
+
+  .scoreBox{
+    background-color:red
   }
   .score{
     display:flex;
@@ -30,3 +45,5 @@
   .list{
     margin-left: -37.5px;
   }
+
+  
