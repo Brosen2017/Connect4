@@ -37,7 +37,7 @@ class Game extends React.Component{
       this.createBoard();
       this.handleScore();
       retrieveBoard((b)=>{
-        //console.log('this is the updated board', b)
+        console.log('this is the updated board', b)
         this.setState({
             board: b
         })
@@ -73,7 +73,7 @@ class Game extends React.Component{
             gameOver: false,
             message:''
         })
-        // updateBoard(this.state.board)
+         updateBoard(board)
     }
 
     handleScore(){
