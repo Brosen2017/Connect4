@@ -13,37 +13,48 @@
   }
 
   .extra{
+    color:red;
+}
+
+  .red{
       color:red;
   }
 
+  .blue{
+    color:blue;
+}
+
   .main{
     display:flex;
-    justify-content: center;
+    justify-content: left;
+    margin-left: 15px;
   }
 
   .highScore{
     font-family: 'Bungee Shade', cursive;
     font-size: 50px;
     color:white;
-    margin-top: -10px;
+    margin-top: -140px;
     margin-bottom: -10px;
     margin-left: 10px;
     margin-right: 10px;
   }
 
   .scoreBox{
-    background-color:red
+    background-color: black;
   }
   .score{
     display:flex;
     flex-direction:column;
     justify-content: right;
-    margin-left: 20px;
+    margin-left: 150px;
     margin-top: -25px;
   }
 
   .list{
     margin-left: -37.5px;
+    display: flex;
+    justify-content: center;
   }
 
   

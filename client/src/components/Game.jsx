@@ -293,13 +293,15 @@ class Game extends React.Component{
                 </table>
                 <div className={styles.score}>
                 <div className={styles.scoreBox}>
-                <h1 className={styles.highScore}>High Score</h1>
+                <h1 className={styles.highScore}><span className={styles.red}>Red</span> vs <span className={styles.blue}>Blue</span></h1>
                 </div>
                 <div className={styles.list}>
                   {this.state.highScore.map((score, i)=><Score score={score} key={i}/>)}
                   </div>
                 </div>
+                <div>
                 <p>{this.state.message}</p>
+                </div>
                 </div>
             </div>
         )
