@@ -26,30 +26,27 @@ class Game extends React.Component{
         this.playGame = this.playGame.bind(this)
     }
 
-    //have a function that emits current player position to server if valid move
-    //once server gets it, need to broadcast to other player that the piece was played (broadcast.emit maybe)
-    //emit globally where the position was placed
-    //potentially use toggle player on server side and use that to determine whose turn it is
-    //client needs a listener for a placed piece to render the board state
-
     componentDidMount(){
       this.createPlayer();
       this.createBoard();
       this.handleScore();
       retrieveBoard((b)=>{
         console.log('this is the updated board', b)
+        if(this.state.gameOver === true){
+          this.setState({
+          board: b,
+          currentPlayer: this.state.player1,
+          gameOver: false,
+          message:''
+         })
+        } else {
         this.setState({
             board: b
         })
+      }
       })
       retrievePlayer((gameMessage)=>{
         console.log('current player', gameMessage)
-        if(gameMessage === null){
-          this.setState({
-            message: 'Draw!',
-            gameOver:true
-          })
-        }
           this.setState({
             message: gameMessage,
             gameOver: true

@@ -40,7 +40,7 @@ io.on('connection', (socket)=>{
             io.emit('player', 'player2 wins!')
         }
         if(player === null){
-            io.emit('player', null)
+            io.emit('player', 'Draw!')
         }
     })
 
