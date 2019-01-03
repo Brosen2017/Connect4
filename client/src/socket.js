@@ -31,13 +31,7 @@ function joinGame(player, cb) {
   }
 
   function updateBoard(board){
-
     socket.emit('board', board);
-
-    // socket.on('board', (b)=>{
-    //   cb(b);
-    // })
-
   }
 
   function retrieveBoard(cb){
@@ -47,4 +41,14 @@ function joinGame(player, cb) {
     })
   }
 
-export { joinGame, playPiece, updateBoard, retrieveBoard };
+  function updatePlayer(player){
+    socket.emit('player', player)
+  }
+
+  function retrievePlayer(cb){
+    socket.on('player', (p)=>{
+      cb(p)
+    })
+  }
+
+export { joinGame, playPiece, updateBoard, retrieveBoard, updatePlayer, retrievePlayer};

@@ -2,7 +2,7 @@ import React from 'react';
 import Board from './Board.jsx';
 import Score from './Score.jsx';
 import styles from '../styles/Game.css';
-import {joinGame, playPiece, updateBoard, retrieveBoard} from '../socket.js'
+import {joinGame, playPiece, updateBoard, retrieveBoard, updatePlayer, retrievePlayer} from '../socket.js'
 import axios from 'axios';
 
 class Game extends React.Component{
@@ -37,10 +37,23 @@ class Game extends React.Component{
       this.createBoard();
       this.handleScore();
       retrieveBoard((b)=>{
-        console.log('this is the updated board', b)
+        //console.log('this is the updated board', b)
         this.setState({
             board: b
         })
+      })
+      retrievePlayer((gameMessage)=>{
+        console.log('current player', gameMessage)
+        if(gameMessage === null){
+          this.setState({
+            message: 'Draw!',
+            gameOver:true
+          })
+        }
+          this.setState({
+            message: gameMessage,
+            gameOver: true
+          })
       })
     }
 
@@ -60,7 +73,7 @@ class Game extends React.Component{
             gameOver: false,
             message:''
         })
-         console.log(this.state)
+        // updateBoard(this.state.board)
     }
 
     handleScore(){
@@ -132,14 +145,17 @@ class Game extends React.Component{
         updateBoard(this.state.board)
         let result = this.checkBoard(board);
         if (result === this.state.player1) {
+          updatePlayer(this.state.player1);
           this.handleWins(this.state.player1);
           this.setState({ board, gameOver: true, message: `${this.checkName(this.state.name1)} (red) wins!` });
         } 
         if (result === this.state.player2) {
+          updatePlayer(this.state.player2);
           this.handleWins(this.state.player2);
           this.setState({ board, gameOver: true, message: `${this.checkName(this.state.name2)} (blue) wins!` });
         } 
         if (result === 'draw') {
+          updatePlayer(null);
           this.setState({ board, gameOver: true, message: 'Draw!' });
         } 
       } else {

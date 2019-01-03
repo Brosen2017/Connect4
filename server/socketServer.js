@@ -27,8 +27,21 @@ io.on('connection', (socket)=>{
     })
 
     socket.on('board', (board)=>{
-        console.log('here is the new board:', board)
+        // console.log('here is the new board:', board)
         io.emit('board', board)
+    })
+
+    socket.on('player', (player)=>{
+        console.log('here is the current player:', player)
+        if(player === 1){
+            io.emit('player', 'player1 wins!')   
+        }
+        if(player === 2){
+            io.emit('player', 'player2 wins!')
+        }
+        if(player === null){
+            io.emit('player', null)
+        }
     })
 
     socket.on('disconnect', function(){
