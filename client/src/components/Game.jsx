@@ -2,7 +2,7 @@ import React from 'react';
 import Board from './Board.jsx';
 import Score from './Score.jsx';
 import styles from '../styles/Game.css';
-import {joinGame, playPiece, updateBoard, retrieveBoard, updatePlayer, retrievePlayer} from '../socket.js'
+import {joinGame, toggle, player, updateName, updateBoard, retrieveBoard, updatePlayer, retrievePlayer} from '../socket.js'
 import axios from 'axios';
 
 class Game extends React.Component{
@@ -27,11 +27,12 @@ class Game extends React.Component{
     }
 
     componentDidMount(){
+      this.startingPlayer();
       this.createPlayer();
       this.createBoard();
       this.handleScore();
       retrieveBoard((b)=>{
-        console.log('this is the updated board', b)
+        //console.log('this is the updated board', b)
         if(this.state.gameOver === true){
           this.setState({
           board: b,
@@ -56,6 +57,7 @@ class Game extends React.Component{
 
     createBoard(){
       this.handleScore();
+      // this.startingPlayer();
         let board = [];
         for(var r = 0; r < 6; r++){
             let row =[];
@@ -66,7 +68,7 @@ class Game extends React.Component{
         }
         this.setState({
             board: board,
-            currentPlayer: this.state.player1,
+            currentPlayer: this.startingPlayer(),
             gameOver: false,
             message:''
         })
@@ -86,20 +88,18 @@ class Game extends React.Component{
 
     //create player based on user prompt
     createPlayer(){
-      let playerName = window.prompt('Name your player');
-      joinGame(playerName, (p)=>{
-      if(p === "taken"){
-        return playerName = window.prompt('Name taken please try something else');
-      } else if(this.state.name1 === null){
+      // let playerName = window.prompt('Name your player');
+      // joinGame(playerName)
+     if(this.state.name1 === null){
         this.setState({
-          name1: p
+          name1: 'player 1'//playerName
         })
       } else if (this.state.name2 === null){
         this.setState({
-          name2: p
+          name2: 'player 2' //playerName
         })
       }
-    });
+ 
   }
 
   //checkPlayer name to determine winner, if undefined will return default name
@@ -114,13 +114,41 @@ class Game extends React.Component{
     }
   }
 
+  startingPlayer(){
+  toggle();
+    player((currentPlayer)=>{
+      if(currentPlayer !== this.state.currentPlayer){
+
+      // console.log('in player toggle', currentPlayer)
+      this.setState({
+       currentPlayer: currentPlayer,
+       
+      })
+    }
+     })
+  }
+
     //change player dependendent on who went last
     togglePlayer(){
-              if(this.state.currentPlayer === this.state.player1){
-                return this.state.player2
-              } else{
-                return this.state.player1
-            }
+      toggle();
+      player((currentPlayer)=>{
+        if(currentPlayer !== this.state.currentPlayer){
+        this.setState({
+         currentPlayer: currentPlayer,
+        
+        })
+      }else{
+        // this.setState({
+        //   message: 'please wait for the other player'
+        // })
+        console.log('not your turn', currentPlayer) 
+      }
+       })
+            //   if(this.state.currentPlayer === this.state.player1){
+            //     return this.state.player2
+            //   } else{
+            //     return this.state.player1
+            // }
     }
 
     show(){

@@ -1,24 +1,50 @@
 const app = require('express')();
 const http = require('http').Server(app)
 var io = require('socket.io')(http);
+const db = require('../database/index.js')
+let store = [];
 
 const PORT = 1337;
 
 //all the server side listeners and emitters go here
 
 io.on('connection', (socket)=>{
+    
+    store.push(socket.id)
 
-    socket.broadcast.emit('user connected');
+    // socket.broadcast.emit('user connected');
     console.log('user connected', socket.id);
     //all listeners and emitters will be inside of the connection
+
     socket.on('join',(player)=>{
-        console.log('player connected', player)
-        if(player === "bob"){
-            io.emit('join', "taken")
+        db.Player.find({
+            Username: player 
+    }, (err, data)=>{
+        if(err){
+            throw(err)
         } else {
-            io.emit('join', player)
+            // console.log('db data', data)
+            if(data.length <= 0){
+                io.emit('join', "taken")
+            } else {
+                io.emit('join', player)
+            }
         }
-    
+    })
+    })
+
+    socket.on('toggle',(currentPlayer)=>{
+        //check if user at store[0] and he will return toggle 2
+        //check if user at store[1] and he will return toggle 1
+        console.log('current player in toggle', currentPlayer, store[0])
+        if(currentPlayer === store[0]){
+            console.log('player 1', currentPlayer)
+        socket.emit('toggle', 2)
+        }
+        if(currentPlayer === store[1]){
+            console.log('player 2', currentPlayer)
+            socket.emit('toggle', 1)
+        }
     })
 
     socket.on('place',(piece)=>{

@@ -3,32 +3,15 @@ const  socket = io('http://localhost:1337');
 
 //all of the listeners and emitters for client go here
 
-function joinGame(player, cb) {
-
-    //socket emit sends data
+function joinGame(player) {
     socket.emit('join', player);
-
-    //socket on listens
-    socket.on('join', (p)=>{
-      // if(p === "taken"){
-      //  alert('username already taken')
-      // } else {
-      // return console.log('user connected', p) 
-      // }
-      cb(p);
-    });
-    
   }
 
-  function playPiece(piece, cb){
-
-    socket.emit('place', piece);
-
-    socket.on('place', (spot)=>{
-    cb(spot)
-    // return JSON.stringify(c)
-    })
-  }
+function updateName(cb){
+  socket.on('join', (p)=>{
+    cb(p);
+  }); 
+}
 
   function updateBoard(board){
     socket.emit('board', board);
@@ -38,6 +21,18 @@ function joinGame(player, cb) {
 
     socket.on('board', (b)=>{
       cb(b);
+    })
+  }
+
+
+  function toggle(){
+    console.log('no socket?', socket.id)
+    socket.emit('toggle', socket.id);
+  }
+
+  function player(cb){
+    socket.on('toggle', (currentPlayer)=>{
+      cb(currentPlayer)
     })
   }
 
@@ -51,4 +46,4 @@ function joinGame(player, cb) {
     })
   }
 
-export { joinGame, playPiece, updateBoard, retrieveBoard, updatePlayer, retrievePlayer};
+export { joinGame, toggle, player, updateName, updateBoard, retrieveBoard, updatePlayer, retrievePlayer};
