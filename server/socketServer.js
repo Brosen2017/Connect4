@@ -39,11 +39,11 @@ io.on('connection', (socket)=>{
         console.log('current player in toggle', currentPlayer, store[0])
         if(currentPlayer === store[0]){
             console.log('player 1', currentPlayer)
-        socket.emit('toggle', 2)
+        socket.broadcast.emit('toggle', 2)
         }
         if(currentPlayer === store[1]){
             console.log('player 2', currentPlayer)
-            socket.emit('toggle', 1)
+            socket.broadcast.emit('toggle', 1)
         }
     })
 
@@ -60,10 +60,10 @@ io.on('connection', (socket)=>{
     socket.on('player', (player)=>{
         console.log('here is the current player:', player)
         if(player === 1){
-            io.emit('player', 'player1 wins!')   
+            io.emit('player', 'Red wins!')   
         }
         if(player === 2){
-            io.emit('player', 'player2 wins!')
+            io.emit('player', 'Blue wins!')
         }
         if(player === null){
             io.emit('player', 'Draw!')

@@ -27,7 +27,7 @@ class Game extends React.Component{
     }
 
     componentDidMount(){
-      this.startingPlayer();
+      //this.startingPlayer();
       this.createPlayer();
       this.createBoard();
       this.handleScore();
@@ -36,7 +36,7 @@ class Game extends React.Component{
         if(this.state.gameOver === true){
           this.setState({
           board: b,
-          currentPlayer: this.state.player1,
+          currentPlayer: this.startingPlayer(),
           gameOver: false,
           message:''
          })
@@ -57,7 +57,6 @@ class Game extends React.Component{
 
     createBoard(){
       this.handleScore();
-      // this.startingPlayer();
         let board = [];
         for(var r = 0; r < 6; r++){
             let row =[];
@@ -92,11 +91,11 @@ class Game extends React.Component{
       // joinGame(playerName)
      if(this.state.name1 === null){
         this.setState({
-          name1: 'player 1'//playerName
+          name1: 'Red'//playerName
         })
       } else if (this.state.name2 === null){
         this.setState({
-          name2: 'player 2' //playerName
+          name2: 'Blue' //playerName
         })
       }
  
@@ -105,10 +104,10 @@ class Game extends React.Component{
   //checkPlayer name to determine winner, if undefined will return default name
   checkName(name){
     if(name === null && this.state.name1 === null || name === ''){
-      return 'player 1'
+      return 'Red'
     }
     if(name === null && this.state.name2 === null || name === ''){
-      return 'player 2'
+      return 'Blue'
     } else {
       return name;
     }
@@ -117,38 +116,25 @@ class Game extends React.Component{
   startingPlayer(){
   toggle();
     player((currentPlayer)=>{
-      if(currentPlayer !== this.state.currentPlayer){
+      console.log('player toggle', currentPlayer, 'current:',this.state.currentPlayer)
+      if(currentPlayer === this.state.currentPlayer){
 
       // console.log('in player toggle', currentPlayer)
       this.setState({
-       currentPlayer: currentPlayer,
-       
+       currentPlayer: 3, 
       })
     }
+      if(currentPlayer !== this.state.currentPlayer){
+      this.setState({
+        currentPlayer: currentPlayer
+      })
+      }
      })
   }
 
     //change player dependendent on who went last
     togglePlayer(){
-      toggle();
-      player((currentPlayer)=>{
-        if(currentPlayer !== this.state.currentPlayer){
-        this.setState({
-         currentPlayer: currentPlayer,
-        
-        })
-      }else{
-        // this.setState({
-        //   message: 'please wait for the other player'
-        // })
-        console.log('not your turn', currentPlayer) 
-      }
-       })
-            //   if(this.state.currentPlayer === this.state.player1){
-            //     return this.state.player2
-            //   } else{
-            //     return this.state.player1
-            // }
+      this.startingPlayer();
     }
 
     show(){

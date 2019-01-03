@@ -9,6 +9,9 @@ let Cell = props =>{
     } else if (props.cell === 2) {
       color = 'blue';
     }
+    // } else if (props.cell === 3){
+    //     color = 'white';
+    // }
 
     return(
         <td>
