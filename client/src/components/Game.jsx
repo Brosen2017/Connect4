@@ -29,7 +29,11 @@ class Game extends React.Component{
 
     componentDidMount(){
       //this.startingPlayer();
-      lobby();
+      joinGame((data)=>{
+        //console.log('join data', data)
+      lobby(data.room, data.player);  
+      })
+      //lobby();
       // this.handleLoading();
       this.createPlayer();
       this.createBoard();

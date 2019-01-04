@@ -3,8 +3,11 @@ const  socket = io('http://localhost:1337');
 
 //all of the listeners and emitters for client go here
 
-function joinGame(player) {
-    socket.emit('join', player);
+function joinGame(cb) {
+    // socket.emit('join', player);
+    socket.on('connectToRoom',(data)=> {
+      cb(data)
+    })
   }
 
 function updateName(cb){
@@ -46,8 +49,8 @@ function updateName(cb){
     })
   }
 
-  function lobby(){
-    socket.emit('lobby', socket.id)
+  function lobby(room, player){
+    socket.emit('lobby', room, player)
   }
 
   function lobbyCheck(cb){
