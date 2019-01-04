@@ -84,4 +84,11 @@
     100% { transform: rotate(360deg); }
   }
 
+  .winBox{
+    display:flex;
+    justify-content: center;
+    font-family: 'Alfa Slab One', cursive;
+    font-size: 40px;
+  }
+
   

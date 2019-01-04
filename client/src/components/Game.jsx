@@ -353,10 +353,11 @@ class Game extends React.Component{
                 <div className={styles.list}>
                   {this.state.highScore.map((score, i)=><Score score={score} key={i}/>)}
                   </div>
+                  <div className={styles.winBox}>
+                {this.state.message}
                 </div>
-                <div>
-                <p>{this.state.message}</p>
                 </div>
+         
                 </div>
             </div>
         )
