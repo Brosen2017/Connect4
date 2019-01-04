@@ -10,6 +10,12 @@ function joinGame(cb) {
     })
   }
 
+function toggleData(cb){
+  socket.on('connectToRoom',(data)=> {
+    cb(data)
+  })
+}
+
 function updateName(cb){
   socket.on('join', (p)=>{
     cb(p);
@@ -27,10 +33,13 @@ function updateName(cb){
     })
   }
 
+  // function playerTrack(){
+  //   socket.emit('update', socket.id)
+  // }
 
-  function toggle(){
+  function toggle(array, room){
     // console.log('no socket?', socket.id)
-    socket.emit('toggle', socket.id);
+    socket.emit('toggle', socket.id, array, room);
   }
 
   function player(cb){
@@ -59,4 +68,4 @@ function updateName(cb){
     })
   }
 
-export { joinGame, lobby, lobbyCheck, toggle, player, updateName, updateBoard, retrieveBoard, updatePlayer, retrievePlayer};
+export { joinGame, toggleData, lobby, lobbyCheck, toggle, player, updateName, updateBoard, retrieveBoard, updatePlayer, retrievePlayer};

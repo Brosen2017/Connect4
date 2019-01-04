@@ -2,6 +2,7 @@ const app = require('express')();
 const http = require('http').Server(app)
 var io = require('socket.io')(http);
 const db = require('../database/index.js')
+let currPlayer = null;
 let store = [];
 let bucket = [];
 
@@ -57,7 +58,8 @@ io.on('connection', (socket)=>{
 
     //now that lobby has been refactored to load dynamically based on room, must refactor other 
     //socket code to attribute on a per room basis
-    socket.on('lobby', (room, player)=>{
+
+        socket.on('lobby', (room, player)=>{
         console.log('client room!', player)
         for(var i=0; i < bucket.length; i++){
             if(JSON.stringify(bucket[i]) === JSON.stringify(player)){
@@ -79,20 +81,31 @@ io.on('connection', (socket)=>{
     }
     })
 
-    socket.on('toggle',(currentPlayer)=>{
+    socket.on('update',(currentPlayer)=>{
+        currPlayer = currentPlayer
+        console.log('player in update', currPlayer)
+    })
+
+    socket.on('toggle',(currentPlayer, array, room)=>{
         //check if user at store[0] and he will return toggle 2
         //check if user at store[1] and he will return toggle 1
-        console.log('current player in toggle', currentPlayer, store[0])
+        console.log('current player in toggle', currentPlayer, room, array)
+        for(var i=0; i < bucket.length; i++){
+            if(JSON.stringify(bucket[i]) === JSON.stringify(array) && room === roomno){
         //implement logic to compare bucket[0][0]
-        if(currentPlayer === store[0]){
-            console.log('player 1', currentPlayer)
-        socket.broadcast.emit('toggle', 2)
-        }
-        //implement logic to compare bucket[0][1]
-        if(currentPlayer === store[1]){
-            console.log('player 2', currentPlayer)
-            socket.broadcast.emit('toggle', 1)
-        }
+                if(currentPlayer === bucket[i][0]){
+                //if(currentPlayer === store[0]){
+                    console.log('player 1', currentPlayer)
+                socket.broadcast.in("room-"+room).emit('toggle', 2)
+                }
+                //implement logic to compare bucket[0][1]
+                if(currentPlayer === bucket[i][1]){
+                //if(currentPlayer === store[1]){
+                    console.log('player 2', currentPlayer)
+                    socket.broadcast.in("room-"+room).emit('toggle', 1)
+                }
+    }
+}
     })
 
     socket.on('place',(piece)=>{

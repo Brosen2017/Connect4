@@ -2,7 +2,7 @@ import React from 'react';
 import Board from './Board.jsx';
 import Score from './Score.jsx';
 import styles from '../styles/Game.css';
-import {joinGame, lobby, lobbyCheck, toggle, player, updateName, updateBoard, retrieveBoard, updatePlayer, retrievePlayer} from '../socket.js'
+import {joinGame, playerTrack, toggleData, lobby, lobbyCheck, toggle, player, updateName, updateBoard, retrieveBoard, updatePlayer, retrievePlayer} from '../socket.js'
 import axios from 'axios';
 
 class Game extends React.Component{
@@ -21,29 +21,34 @@ class Game extends React.Component{
             highScore:[],
             message: '',
             test: true,
-            loading:true
+            loading:true,
+            player:[],
+            room:''
 
         }
         this.playGame = this.playGame.bind(this)
     }
 
     componentDidMount(){
-      //this.startingPlayer();
+      //playerTrack();
+      
       joinGame((data)=>{
         //console.log('join data', data)
       lobby(data.room, data.player);  
       })
       //lobby();
       // this.handleLoading();
-      this.createPlayer();
+      //this.createPlayer();
       this.createBoard();
-      this.handleScore();
+      //this.handleScore();
       retrieveBoard((b)=>{
         //console.log('this is the updated board', b)
+        
         if(this.state.gameOver === true){
+          this.startingPlayer();
           this.setState({
           board: b,
-          currentPlayer: this.startingPlayer(),
+          //currentPlayer: this.startingPlayer(),
           gameOver: false,
           message:''
          })
@@ -64,7 +69,7 @@ class Game extends React.Component{
 
     handleLoading(){
       lobbyCheck((b)=>{
-        console.log('lobby full?', b)
+        //console.log('lobby full?', b)
         if(b === true){
           this.setState({
             loading: false
@@ -96,9 +101,10 @@ class Game extends React.Component{
             }
             board.push(row);
         }
+        this.startingPlayer();
         this.setState({
             board: board,
-            currentPlayer: this.startingPlayer(),
+            //currentPlayer: this.startingPlayer(),
             gameOver: false,
             message:''
         })
@@ -118,20 +124,20 @@ class Game extends React.Component{
     }
 
     //create player based on user prompt
-    createPlayer(){
-      // let playerName = window.prompt('Name your player');
-      // joinGame(playerName)
-     if(this.state.name1 === null){
-        this.setState({
-          name1: 'Red'//playerName
-        })
-      } else if (this.state.name2 === null){
-        this.setState({
-          name2: 'Blue' //playerName
-        })
-      }
+  //   createPlayer(){
+  //     // let playerName = window.prompt('Name your player');
+  //     // joinGame(playerName)
+  //    if(this.state.name1 === null){
+  //       this.setState({
+  //         name1: 'Red'//playerName
+  //       })
+  //     } else if (this.state.name2 === null){
+  //       this.setState({
+  //         name2: 'Blue' //playerName
+  //       })
+  //     }
  
-  }
+  // }
 
   //checkPlayer name to determine winner, if undefined will return default name
   checkName(name){
@@ -146,21 +152,35 @@ class Game extends React.Component{
   }
 
   startingPlayer(){
-  toggle();
+    console.log('Ive been triggered')
+  toggleData((data)=>{
+    //console.log('connected player:', data.player, 'room:', data.room)
+    this.setState({
+      player: data.player,
+      room:data.room
+    })
+    console.log('the state', this.state.player)
+    toggle(data.player, data.room);
+  })
+  toggle(this.state.player, this.state.room);
     player((currentPlayer)=>{
-      // console.log('player toggle', currentPlayer, 'current:',this.state.currentPlayer)
+      
+      //  console.log('player toggle', currentPlayer, 'current:',this.state.currentPlayer)
       if(currentPlayer === this.state.currentPlayer){
 
       // console.log('in player toggle', currentPlayer)
       this.setState({
        currentPlayer: 3, 
       })
+       //return this.state.currentPlayer
     }
       if(currentPlayer !== this.state.currentPlayer){
       this.setState({
         currentPlayer: currentPlayer
       })
+       //return currentPlayer;
       }
+      console.log('player toggle', currentPlayer, 'current:',this.state.currentPlayer)
      })
   }
 
