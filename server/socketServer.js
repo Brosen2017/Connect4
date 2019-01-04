@@ -13,7 +13,7 @@ io.on('connection', (socket)=>{
     store.push(socket.id)
 
     // socket.broadcast.emit('user connected');
-    console.log('user connected', socket.id);
+    console.log('user connected', socket.id, store.length);
     //all listeners and emitters will be inside of the connection
 
     socket.on('join',(player)=>{
@@ -31,6 +31,14 @@ io.on('connection', (socket)=>{
             }
         }
     })
+    })
+
+    socket.on('lobby', ()=>{
+        if(store.length >= 2){
+            io.emit('lobby', true)
+        } else {
+            io.emit('lobby', false)
+        }
     })
 
     socket.on('toggle',(currentPlayer)=>{
@@ -71,6 +79,7 @@ io.on('connection', (socket)=>{
     })
 
     socket.on('disconnect', function(){
+        store.pop();
         console.log('user disconnected');
       });
 })

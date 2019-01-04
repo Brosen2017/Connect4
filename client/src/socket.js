@@ -26,7 +26,7 @@ function updateName(cb){
 
 
   function toggle(){
-    console.log('no socket?', socket.id)
+    // console.log('no socket?', socket.id)
     socket.emit('toggle', socket.id);
   }
 
@@ -46,4 +46,14 @@ function updateName(cb){
     })
   }
 
-export { joinGame, toggle, player, updateName, updateBoard, retrieveBoard, updatePlayer, retrievePlayer};
+  function lobby(){
+    socket.emit('lobby', socket.id)
+  }
+
+  function lobbyCheck(cb){
+    socket.on('lobby', (bool)=>{
+      cb(bool)
+    })
+  }
+
+export { joinGame, lobby, lobbyCheck, toggle, player, updateName, updateBoard, retrieveBoard, updatePlayer, retrievePlayer};

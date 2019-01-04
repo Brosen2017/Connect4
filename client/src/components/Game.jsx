@@ -2,7 +2,7 @@ import React from 'react';
 import Board from './Board.jsx';
 import Score from './Score.jsx';
 import styles from '../styles/Game.css';
-import {joinGame, toggle, player, updateName, updateBoard, retrieveBoard, updatePlayer, retrievePlayer} from '../socket.js'
+import {joinGame, lobby, lobbyCheck, toggle, player, updateName, updateBoard, retrieveBoard, updatePlayer, retrievePlayer} from '../socket.js'
 import axios from 'axios';
 
 class Game extends React.Component{
@@ -20,7 +20,8 @@ class Game extends React.Component{
             gameOver: false,
             highScore:[],
             message: '',
-            test: true
+            test: true,
+            loading:true
 
         }
         this.playGame = this.playGame.bind(this)
@@ -28,6 +29,8 @@ class Game extends React.Component{
 
     componentDidMount(){
       //this.startingPlayer();
+      lobby();
+      // this.handleLoading();
       this.createPlayer();
       this.createBoard();
       this.handleScore();
@@ -55,6 +58,30 @@ class Game extends React.Component{
       })
     }
 
+    handleLoading(){
+      lobbyCheck((b)=>{
+        console.log('lobby full?', b)
+        if(b === true){
+          this.setState({
+            loading: false
+          })
+        }
+        if(b === false){
+          this.setState({
+            loading: true
+          })
+        }
+      })
+        if(this.state.loading === true){
+        // return (<div><h1>Waiting for other players</h1></div>)
+        return true
+        } 
+        if(this.state.loading === false){
+          return false;
+        }
+    }
+    
+
     createBoard(){
       this.handleScore();
         let board = [];
@@ -78,6 +105,7 @@ class Game extends React.Component{
       axios
       .get('/player')
       .then((res)=>{
+        // console.log('in score data', res.data)
         this.setState({
           highScore: res.data
         })
@@ -116,7 +144,7 @@ class Game extends React.Component{
   startingPlayer(){
   toggle();
     player((currentPlayer)=>{
-      console.log('player toggle', currentPlayer, 'current:',this.state.currentPlayer)
+      // console.log('player toggle', currentPlayer, 'current:',this.state.currentPlayer)
       if(currentPlayer === this.state.currentPlayer){
 
       // console.log('in player toggle', currentPlayer)
@@ -177,12 +205,22 @@ class Game extends React.Component{
     //keep track of current wins per player and update database per win based on username and win
     handleWins(player){
       if(player === this.state.player1){
+      axios
+      .get('/player')
+      .then((res)=>{
+        // console.log('in score data', res.data)
+        if(res.data.length <= 0 || res.data[0].Username === 'Blue' && !res.data[1]){
+          this.setState({
+            wins1: 1
+          })
+        } else {
+        let updatedWins = (res.data[0].Wins + 1);
         this.setState({
-          wins1: (this.state.wins1 + 1)
+          wins1: updatedWins || 1
         })
-        let name = this.checkName(this.state.name1)
+      }
         let user = {
-          name: name,
+          name: 'Red',
           wins: this.state.wins1
         }
         axios
@@ -191,21 +229,35 @@ class Game extends React.Component{
           console.log(res.data)
         })
         .catch(err=>console.log(err));
+      })
+      .catch(err=>console.log(err))
       } else if(player === this.state.player2){
-        this.setState({
-          wins2: this.state.wins2 + 1
-        })
-        let name = this.checkName(this.state.name2)
-        let user = {
-          name: name,
-          wins: this.state.wins2
-        }
         axios
-        .patch('/player', {user})
+        .get('/player')
         .then((res)=>{
-          console.log(res.data)
+          console.log('in score data', res.data)
+          if(res.data.length <= 0 || res.data[0].Username === 'Red' && !res.data[1]){
+            this.setState({
+              wins2: 1
+            })
+          } else {
+          let updatedWins = (res.data[1].Wins + 1);
+          this.setState({
+            wins2: updatedWins || 1
+          })
+        }
+          let user = {
+            name: 'Blue',
+            wins: this.state.wins2
+          }
+          axios
+          .patch('/player', {user})
+          .then((res)=>{
+            console.log(res.data)
+          })
+          .catch(err=>console.log(err));
         })
-        .catch(err=>console.log(err));
+        .catch(err=>console.log(err))
       }
     }
 
@@ -278,6 +330,9 @@ class Game extends React.Component{
 
 
     render(){
+      if(this.handleLoading()){
+        return <div className={styles.lobby}><div></div><h1 className={styles.lobbyText}>Waiting for other players...</h1><div className={styles.loader}></div></div>
+      } else {
         return(
             <div>
                 <div className={styles.header}>
@@ -305,6 +360,7 @@ class Game extends React.Component{
                 </div>
             </div>
         )
+      }
     }
 }
 
