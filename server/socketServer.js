@@ -124,7 +124,9 @@ io.on('connection', (socket)=>{
         for(var i = 0; i < bucket.length; i++){
             for(x =0; x < bucket[i].length; x++){
                 if(bucket[i][x] === socket.id){
-                    console.log('disconnect in room', i + 1)
+                    // console.log('disconnect in room', i + 1, 'bucket', bucket)
+                    // bucket.splice(i,1,[]); //refactor needed to iron out bugs, works fine without it, but could save space this way
+                    // console.log('current bucket', bucket)
                     io.in("room-"+(i+1)).emit('disconnect', true)
                 }
             }
