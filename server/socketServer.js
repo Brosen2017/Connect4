@@ -4,13 +4,27 @@ var io = require('socket.io')(http);
 const db = require('../database/index.js')
 let store = [];
 let bucket = [];
-let rooms = [1,2,3,4,5,6,7,8,9,10]
+//let rooms = [1,2,3,4,5,6,7,8,9,10]
+let rooms = [1]
+
+// for(var i = 1; i < 100; i++ ){
+//     rooms.push(i)
+// }
+
+
 
 const PORT = 1337;
 
 
 var roomno = 1;
 io.on('connection', (socket)=>{
+    
+     if(rooms[roomno-1] !== roomno){
+         rooms.push(roomno)
+    }
+    
+    
+    console.log('current rooms', rooms)
     if(store.length < 2){
     store.push(socket.id)
     }
@@ -74,12 +88,10 @@ io.on('connection', (socket)=>{
         for(var i=0; i < bucket.length; i++){
             if(JSON.stringify(bucket[i]) === JSON.stringify(array) && room === rooms[room-1]){
                 if(currentPlayer === bucket[i][0]){
-                //if(currentPlayer === store[0]){
                     console.log('player 1', currentPlayer)
                 socket.broadcast.in("room-"+rooms[room-1]).emit('toggle', 2)
                 }
                 if(currentPlayer === bucket[i][1]){
-                //if(currentPlayer === store[1]){
                     console.log('player 2', currentPlayer)
                     socket.broadcast.in("room-"+rooms[room-1]).emit('toggle', 1)
                 }
