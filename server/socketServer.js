@@ -34,7 +34,7 @@ io.on('connection', (socket)=>{
 
     //verify user rooms are full on a per room basis, if true game will start, if not loading screen will open
     socket.on('lobby', (room, player)=>{
-        //console.log('client room!', player)
+        console.log('client room!', player)
         for(var i=0; i < bucket.length; i++){
             if(JSON.stringify(bucket[i]) === JSON.stringify(player)){
                 if(bucket[room -1].length >= 2){
@@ -86,11 +86,11 @@ io.on('connection', (socket)=>{
 
     //verify the room the user disconnected from, and let the other player in the room know that they can start a new match
     socket.on('disconnect', function(){
-        //console.log('user disconnected', socket.id);
+        console.log('user disconnected', socket.id);
         for(var i = 0; i < bucket.length; i++){
             for(x =0; x < bucket[i].length; x++){
                 if(bucket[i][x] === socket.id){
-                    // console.log('disconnect in room', i + 1, 'bucket', bucket)
+                    console.log('disconnect in room', i + 1)
                     // bucket.splice(i,1,[]); //refactor needed to iron out bugs, works fine without it, but could save space this way
                     // console.log('current bucket', bucket)
                     io.in("room-"+(i+1)).emit('disconnect', true)
