@@ -108,9 +108,17 @@ io.on('connection', (socket)=>{
     })
 
     socket.on('disconnect', function(){
-        console.log('user disconnected');
+        console.log('user disconnected', socket.id);
+        for(var i = 0; i < bucket.length; i++){
+            for(x =0; x < bucket[i].length; x++){
+                if(bucket[i][x] === socket.id){
+                    console.log('disconnect in room', i + 1)
+                    io.in("room-"+(i+1)).emit('disconnect', true)
+                }
+            }
+        }
         //incorporate logic to implemement win or loss if someone disconnects
-        //if useor disconnects return other player to loading screen
+        //if user disconnects return other player to loading screen
         //if another user connects, push them into the room with an open space
       });
 })

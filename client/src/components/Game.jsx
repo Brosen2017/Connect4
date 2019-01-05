@@ -2,7 +2,7 @@ import React from 'react';
 import Board from './Board.jsx';
 import Score from './Score.jsx';
 import styles from '../styles/Game.css';
-import {joinGame, playerTrack, toggleData, lobby, lobbyCheck, toggle, player, updateName, updateBoard, retrieveBoard, updatePlayer, retrievePlayer} from '../socket.js'
+import {joinGame, disconnect, toggleData, lobby, lobbyCheck, toggle, player, updateName, updateBoard, retrieveBoard, updatePlayer, retrievePlayer} from '../socket.js'
 import axios from 'axios';
 
 class Game extends React.Component{
@@ -20,8 +20,9 @@ class Game extends React.Component{
             gameOver: false,
             highScore:[],
             message: '',
-            test: true,
+            // test: true,
             loading:true,
+            disconnect:false,
             player:[],
             room:''
 
@@ -30,10 +31,14 @@ class Game extends React.Component{
     }
 
     componentDidMount(){
-      //playerTrack();
+      disconnect((b)=>{
+        console.log('player disconnected', b)
+        this.setState({
+          disconnect: b
+        })
+      })
       
       joinGame((data)=>{
-        //console.log('join data', data)
         this.setState({
           room: data.room
         })
@@ -85,12 +90,25 @@ class Game extends React.Component{
         }
       })
         if(this.state.loading === true){
-        // return (<div><h1>Waiting for other players</h1></div>)
         return true
         } 
         if(this.state.loading === false){
           return false;
         }
+    }
+
+    handleDisconnect(){
+      disconnect((b)=>{
+        console.log('player disconnected', b)
+        this.setState({
+          disconnect: b
+        })
+      })
+      if(this.state.disconnect === true){
+        return true;
+      } else {
+        return false;
+      }
     }
     
 
@@ -359,7 +377,10 @@ class Game extends React.Component{
     render(){
       if(this.handleLoading()){
         return <div className={styles.lobby}><div></div><h1 className={styles.lobbyText}>Waiting for other players...</h1><div className={styles.loader}></div></div>
-      } else {
+      } 
+      if(this.handleDisconnect()){
+        return <div className={styles.disconnect}><div></div><h1 className={styles.errorText}>Error Player disconnected, please refresh the page to rejoin lobby</h1></div>
+      }else{
         return(
             <div>
                 <div className={styles.header}>

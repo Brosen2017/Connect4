@@ -66,8 +66,22 @@
     height:100%;
   }
 
+  .disconnect{
+    display:flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width:100%;
+    height:100%;
+  }
+
+
   .lobbyText{
        font-size:100px;
+  }
+
+  .errorText{
+    font-size:50px;
   }
 
   .loader {

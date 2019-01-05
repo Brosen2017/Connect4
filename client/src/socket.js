@@ -68,4 +68,10 @@ function updateName(cb){
     })
   }
 
-export { joinGame, toggleData, lobby, lobbyCheck, toggle, player, updateName, updateBoard, retrieveBoard, updatePlayer, retrievePlayer};
+  function disconnect(cb){
+    socket.on('disconnect',(bool)=>{
+      cb(bool)
+    })
+  }
+
+export { joinGame, disconnect, toggleData, lobby, lobbyCheck, toggle, player, updateName, updateBoard, retrieveBoard, updatePlayer, retrievePlayer};
