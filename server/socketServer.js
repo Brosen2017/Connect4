@@ -1,86 +1,102 @@
 const app = require('express')();
 const http = require('http').Server(app)
 var io = require('socket.io')(http);
-const db = require('../database/index.js')
-let store = [];
-
+//const db = require('../database/index.js')
 const PORT = 1337;
+let store = [];
+let bucket = [];
+let rooms = [1]
 
-//all the server side listeners and emitters go here
 
+
+
+var roomno = 1;
 io.on('connection', (socket)=>{
     
+    if(rooms[roomno-1] !== roomno){
+         rooms.push(roomno)
+    }
+    
+    if(store.length < 2){
     store.push(socket.id)
+    }
 
-    // socket.broadcast.emit('user connected');
-    console.log('user connected', socket.id, store.length);
-    //all listeners and emitters will be inside of the connection
+    //create a new room every time two players join into a room
+    if(io.nsps['/'].adapter.rooms["room-"+roomno] && io.nsps['/'].adapter.rooms["room-"+roomno].length > 1) roomno++;
+   socket.join("room-"+roomno);
 
-    socket.on('join',(player)=>{
-        db.Player.find({
-            Username: player 
-    }, (err, data)=>{
-        if(err){
-            throw(err)
-        } else {
-            // console.log('db data', data)
-            if(data.length <= 0){
-                io.emit('join', "taken")
-            } else {
-                io.emit('join', player)
+   //send the user room to the connected clients, push the toom into the room bucket and reset store array 
+   io.sockets.in("room-"+roomno).emit('connectToRoom', {player: store, room: +roomno});
+   if(store.length === 2){
+    bucket.push(store)
+    store = []
+    }
+
+    //verify user rooms are full on a per room basis, if true game will start, if not loading screen will open
+    socket.on('lobby', (room, player)=>{
+        //console.log('client room!', player)
+        for(var i=0; i < bucket.length; i++){
+            if(JSON.stringify(bucket[i]) === JSON.stringify(player)){
+                if(bucket[room -1].length >= 2){
+                    io.in("room-"+room).emit('lobby', true)
+
+                } else {
+                io.in("room-"+room).emit('lobby', false)
+                }
             }
         }
     })
+
+    //verify the current room and room number, if they match check the current player and emit the next turn the other player connected in the room
+    socket.on('toggle',(currentPlayer, array, room)=>{
+        for(var i=0; i < bucket.length; i++){
+            if(JSON.stringify(bucket[i]) === JSON.stringify(array) && room === rooms[room-1]){
+                if(currentPlayer === bucket[i][0]){
+                    //console.log('player 1', currentPlayer)
+                socket.broadcast.in("room-"+rooms[room-1]).emit('toggle', 2)
+                }
+                if(currentPlayer === bucket[i][1]){
+                    //console.log('player 2', currentPlayer)
+                    socket.broadcast.in("room-"+rooms[room-1]).emit('toggle', 1)
+                }
+    }
+}
     })
 
-    socket.on('lobby', ()=>{
-        if(store.length >= 2){
-            io.emit('lobby', true)
-        } else {
-            io.emit('lobby', false)
-        }
+    //refresh the board based on the room its coming from
+    socket.on('board', (board, room)=>{
+        io.in("room-"+room).emit('board', board)
     })
 
-    socket.on('toggle',(currentPlayer)=>{
-        //check if user at store[0] and he will return toggle 2
-        //check if user at store[1] and he will return toggle 1
-        console.log('current player in toggle', currentPlayer, store[0])
-        if(currentPlayer === store[0]){
-            console.log('player 1', currentPlayer)
-        socket.broadcast.emit('toggle', 2)
-        }
-        if(currentPlayer === store[1]){
-            console.log('player 2', currentPlayer)
-            socket.broadcast.emit('toggle', 1)
-        }
-    })
+    //this function is only called when a player wins or draws, and it emits the winning player to all connected in the room
+    socket.on('player', (player, room)=>{
 
-    socket.on('place',(piece)=>{
-        console.log('piece placed at index:', piece)
-        io.emit('place', piece)
-    })
-
-    socket.on('board', (board)=>{
-        // console.log('here is the new board:', board)
-        io.emit('board', board)
-    })
-
-    socket.on('player', (player)=>{
-        console.log('here is the current player:', player)
+        //console.log('here is the current player:', player)
         if(player === 1){
-            io.emit('player', 'Red wins!')   
+            io.in("room-"+room).emit('player', 'Red wins!')   
         }
         if(player === 2){
-            io.emit('player', 'Blue wins!')
+            io.in("room-"+room).emit('player', 'Blue wins!')
         }
         if(player === null){
-            io.emit('player', 'Draw!')
+            io.in("room-"+room).emit('player', 'Draw!')
         }
+    
     })
 
+    //verify the room the user disconnected from, and let the other player in the room know that they can start a new match
     socket.on('disconnect', function(){
-        store.pop();
-        console.log('user disconnected');
+        //console.log('user disconnected', socket.id);
+        for(var i = 0; i < bucket.length; i++){
+            for(x =0; x < bucket[i].length; x++){
+                if(bucket[i][x] === socket.id){
+                    // console.log('disconnect in room', i + 1, 'bucket', bucket)
+                    // bucket.splice(i,1,[]); //refactor needed to iron out bugs, works fine without it, but could save space this way
+                    // console.log('current bucket', bucket)
+                    io.in("room-"+(i+1)).emit('disconnect', true)
+                }
+            }
+        }
       });
 })
 

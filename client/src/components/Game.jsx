@@ -2,7 +2,7 @@ import React from 'react';
 import Board from './Board.jsx';
 import Score from './Score.jsx';
 import styles from '../styles/Game.css';
-import {joinGame, lobby, lobbyCheck, toggle, player, updateName, updateBoard, retrieveBoard, updatePlayer, retrievePlayer} from '../socket.js'
+import {joinGame, disconnect, toggleData, lobby, lobbyCheck, toggle, player, updateName, updateBoard, retrieveBoard, updatePlayer, retrievePlayer} from '../socket.js'
 import axios from 'axios';
 
 class Game extends React.Component{
@@ -20,26 +20,43 @@ class Game extends React.Component{
             gameOver: false,
             highScore:[],
             message: '',
-            test: true,
-            loading:true
+            // test: true,
+            loading:true,
+            disconnect:false,
+            player:[],
+            room:''
 
         }
         this.playGame = this.playGame.bind(this)
     }
 
     componentDidMount(){
-      //this.startingPlayer();
-      lobby();
+      disconnect((b)=>{
+        console.log('player disconnected', b)
+        this.setState({
+          disconnect: b
+        })
+      })
+      
+      joinGame((data)=>{
+        this.setState({
+          room: data.room
+        })
+      lobby(data.room, data.player);  
+      })
+      //lobby();
       // this.handleLoading();
-      this.createPlayer();
+      //this.createPlayer();
       this.createBoard();
-      this.handleScore();
+      //this.handleScore();
       retrieveBoard((b)=>{
         //console.log('this is the updated board', b)
+        
         if(this.state.gameOver === true){
+          this.startingPlayer();
           this.setState({
           board: b,
-          currentPlayer: this.startingPlayer(),
+          //currentPlayer: this.startingPlayer(),
           gameOver: false,
           message:''
          })
@@ -60,7 +77,7 @@ class Game extends React.Component{
 
     handleLoading(){
       lobbyCheck((b)=>{
-        console.log('lobby full?', b)
+        //console.log('lobby full?', b)
         if(b === true){
           this.setState({
             loading: false
@@ -73,12 +90,25 @@ class Game extends React.Component{
         }
       })
         if(this.state.loading === true){
-        // return (<div><h1>Waiting for other players</h1></div>)
         return true
         } 
         if(this.state.loading === false){
           return false;
         }
+    }
+
+    handleDisconnect(){
+      disconnect((b)=>{
+        console.log('player disconnected', b)
+        this.setState({
+          disconnect: b
+        })
+      })
+      if(this.state.disconnect === true){
+        return true;
+      } else {
+        return false;
+      }
     }
     
 
@@ -92,13 +122,14 @@ class Game extends React.Component{
             }
             board.push(row);
         }
+        this.startingPlayer();
         this.setState({
             board: board,
-            currentPlayer: this.startingPlayer(),
+            //currentPlayer: this.startingPlayer(),
             gameOver: false,
             message:''
         })
-         updateBoard(board)
+         updateBoard(board, this.state.room)
     }
 
     handleScore(){
@@ -114,20 +145,20 @@ class Game extends React.Component{
     }
 
     //create player based on user prompt
-    createPlayer(){
-      // let playerName = window.prompt('Name your player');
-      // joinGame(playerName)
-     if(this.state.name1 === null){
-        this.setState({
-          name1: 'Red'//playerName
-        })
-      } else if (this.state.name2 === null){
-        this.setState({
-          name2: 'Blue' //playerName
-        })
-      }
+  //   createPlayer(){
+  //     // let playerName = window.prompt('Name your player');
+  //     // joinGame(playerName)
+  //    if(this.state.name1 === null){
+  //       this.setState({
+  //         name1: 'Red'//playerName
+  //       })
+  //     } else if (this.state.name2 === null){
+  //       this.setState({
+  //         name2: 'Blue' //playerName
+  //       })
+  //     }
  
-  }
+  // }
 
   //checkPlayer name to determine winner, if undefined will return default name
   checkName(name){
@@ -142,21 +173,35 @@ class Game extends React.Component{
   }
 
   startingPlayer(){
-  toggle();
+    console.log('Ive been triggered')
+  toggleData((data)=>{
+    //console.log('connected player:', data.player, 'room:', data.room)
+    this.setState({
+      player: data.player,
+      room:data.room
+    })
+    console.log('the state', this.state.player)
+    toggle(data.player, data.room);
+  })
+  toggle(this.state.player, this.state.room);
     player((currentPlayer)=>{
-      // console.log('player toggle', currentPlayer, 'current:',this.state.currentPlayer)
+      
+      //  console.log('player toggle', currentPlayer, 'current:',this.state.currentPlayer)
       if(currentPlayer === this.state.currentPlayer){
 
       // console.log('in player toggle', currentPlayer)
       this.setState({
        currentPlayer: 3, 
       })
+       //return this.state.currentPlayer
     }
       if(currentPlayer !== this.state.currentPlayer){
       this.setState({
         currentPlayer: currentPlayer
       })
+       //return currentPlayer;
       }
+      console.log('player toggle', currentPlayer, 'current:',this.state.currentPlayer)
      })
   }
 
@@ -181,20 +226,20 @@ class Game extends React.Component{
           }
         }
         this.setState({ board, currentPlayer: this.togglePlayer() });
-        updateBoard(this.state.board)
+        updateBoard(this.state.board, this.state.room)
         let result = this.checkBoard(board);
         if (result === this.state.player1) {
-          updatePlayer(this.state.player1);
+          updatePlayer(this.state.player1, this.state.room);
           this.handleWins(this.state.player1);
           this.setState({ board, gameOver: true, message: `${this.checkName(this.state.name1)} (red) wins!` });
         } 
         if (result === this.state.player2) {
-          updatePlayer(this.state.player2);
+          updatePlayer(this.state.player2, this.state.room);
           this.handleWins(this.state.player2);
           this.setState({ board, gameOver: true, message: `${this.checkName(this.state.name2)} (blue) wins!` });
         } 
         if (result === 'draw') {
-          updatePlayer(null);
+          updatePlayer(null, this.state.room);
           this.setState({ board, gameOver: true, message: 'Draw!' });
         } 
       } else {
@@ -332,7 +377,10 @@ class Game extends React.Component{
     render(){
       if(this.handleLoading()){
         return <div className={styles.lobby}><div></div><h1 className={styles.lobbyText}>Waiting for other players...</h1><div className={styles.loader}></div></div>
-      } else {
+      } 
+      if(this.handleDisconnect()){
+        return <div className={styles.disconnect}><div></div><h1 className={styles.errorText}>Error Player disconnected, please refresh the page to rejoin lobby</h1></div>
+      }else{
         return(
             <div>
                 <div className={styles.header}>

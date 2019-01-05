@@ -3,9 +3,18 @@ const  socket = io('http://localhost:1337');
 
 //all of the listeners and emitters for client go here
 
-function joinGame(player) {
-    socket.emit('join', player);
+function joinGame(cb) {
+    // socket.emit('join', player);
+    socket.on('connectToRoom',(data)=> {
+      cb(data)
+    })
   }
+
+function toggleData(cb){
+  socket.on('connectToRoom',(data)=> {
+    cb(data)
+  })
+}
 
 function updateName(cb){
   socket.on('join', (p)=>{
@@ -13,8 +22,8 @@ function updateName(cb){
   }); 
 }
 
-  function updateBoard(board){
-    socket.emit('board', board);
+  function updateBoard(board, room){
+    socket.emit('board', board, room);
   }
 
   function retrieveBoard(cb){
@@ -24,10 +33,13 @@ function updateName(cb){
     })
   }
 
+  // function playerTrack(){
+  //   socket.emit('update', socket.id)
+  // }
 
-  function toggle(){
+  function toggle(array, room){
     // console.log('no socket?', socket.id)
-    socket.emit('toggle', socket.id);
+    socket.emit('toggle', socket.id, array, room);
   }
 
   function player(cb){
@@ -36,8 +48,8 @@ function updateName(cb){
     })
   }
 
-  function updatePlayer(player){
-    socket.emit('player', player)
+  function updatePlayer(player, room){
+    socket.emit('player', player, room)
   }
 
   function retrievePlayer(cb){
@@ -46,8 +58,8 @@ function updateName(cb){
     })
   }
 
-  function lobby(){
-    socket.emit('lobby', socket.id)
+  function lobby(room, player){
+    socket.emit('lobby', room, player)
   }
 
   function lobbyCheck(cb){
@@ -56,4 +68,10 @@ function updateName(cb){
     })
   }
 
-export { joinGame, lobby, lobbyCheck, toggle, player, updateName, updateBoard, retrieveBoard, updatePlayer, retrievePlayer};
+  function disconnect(cb){
+    socket.on('disconnect',(bool)=>{
+      cb(bool)
+    })
+  }
+
+export { joinGame, disconnect, toggleData, lobby, lobbyCheck, toggle, player, updateName, updateBoard, retrieveBoard, updatePlayer, retrievePlayer};
