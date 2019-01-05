@@ -22,8 +22,8 @@ function updateName(cb){
   }); 
 }
 
-  function updateBoard(board){
-    socket.emit('board', board);
+  function updateBoard(board, room){
+    socket.emit('board', board, room);
   }
 
   function retrieveBoard(cb){
@@ -48,8 +48,8 @@ function updateName(cb){
     })
   }
 
-  function updatePlayer(player){
-    socket.emit('player', player)
+  function updatePlayer(player, room){
+    socket.emit('player', player, room)
   }
 
   function retrievePlayer(cb){

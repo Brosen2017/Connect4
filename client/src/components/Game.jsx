@@ -34,6 +34,9 @@ class Game extends React.Component{
       
       joinGame((data)=>{
         //console.log('join data', data)
+        this.setState({
+          room: data.room
+        })
       lobby(data.room, data.player);  
       })
       //lobby();
@@ -108,7 +111,7 @@ class Game extends React.Component{
             gameOver: false,
             message:''
         })
-         updateBoard(board)
+         updateBoard(board, this.state.room)
     }
 
     handleScore(){
@@ -205,20 +208,20 @@ class Game extends React.Component{
           }
         }
         this.setState({ board, currentPlayer: this.togglePlayer() });
-        updateBoard(this.state.board)
+        updateBoard(this.state.board, this.state.room)
         let result = this.checkBoard(board);
         if (result === this.state.player1) {
-          updatePlayer(this.state.player1);
+          updatePlayer(this.state.player1, this.state.room);
           this.handleWins(this.state.player1);
           this.setState({ board, gameOver: true, message: `${this.checkName(this.state.name1)} (red) wins!` });
         } 
         if (result === this.state.player2) {
-          updatePlayer(this.state.player2);
+          updatePlayer(this.state.player2, this.state.room);
           this.handleWins(this.state.player2);
           this.setState({ board, gameOver: true, message: `${this.checkName(this.state.name2)} (blue) wins!` });
         } 
         if (result === 'draw') {
-          updatePlayer(null);
+          updatePlayer(null, this.state.room);
           this.setState({ board, gameOver: true, message: 'Draw!' });
         } 
       } else {

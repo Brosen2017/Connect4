@@ -5,6 +5,7 @@ const db = require('../database/index.js')
 let currPlayer = null;
 let store = [];
 let bucket = [];
+let rooms = [1,2,3,4,5,6,7,8,9,10]
 
 const PORT = 1337;
 
@@ -81,54 +82,56 @@ io.on('connection', (socket)=>{
     }
     })
 
-    socket.on('update',(currentPlayer)=>{
-        currPlayer = currentPlayer
-        console.log('player in update', currPlayer)
-    })
+    // socket.on('update',(currentPlayer)=>{
+    //     currPlayer = currentPlayer
+    //     console.log('player in update', currPlayer)
+    // })
 
     socket.on('toggle',(currentPlayer, array, room)=>{
         //check if user at store[0] and he will return toggle 2
         //check if user at store[1] and he will return toggle 1
-        console.log('current player in toggle', currentPlayer, room, array)
+        //console.log('current player in toggle', currentPlayer, room, array)
         for(var i=0; i < bucket.length; i++){
-            if(JSON.stringify(bucket[i]) === JSON.stringify(array) && room === roomno){
+            if(JSON.stringify(bucket[i]) === JSON.stringify(array) && room === rooms[room-1]){
         //implement logic to compare bucket[0][0]
                 if(currentPlayer === bucket[i][0]){
                 //if(currentPlayer === store[0]){
                     console.log('player 1', currentPlayer)
-                socket.broadcast.in("room-"+room).emit('toggle', 2)
+                socket.broadcast.in("room-"+rooms[room-1]).emit('toggle', 2)
                 }
                 //implement logic to compare bucket[0][1]
                 if(currentPlayer === bucket[i][1]){
                 //if(currentPlayer === store[1]){
                     console.log('player 2', currentPlayer)
-                    socket.broadcast.in("room-"+room).emit('toggle', 1)
+                    socket.broadcast.in("room-"+rooms[room-1]).emit('toggle', 1)
                 }
     }
 }
     })
 
-    socket.on('place',(piece)=>{
-        console.log('piece placed at index:', piece)
-        io.emit('place', piece)
-    })
+    // socket.on('place',(piece)=>{
+    //     //console.log('piece placed at index:', piece)
+    //     io.emit('place', piece)
+    // })
 
-    socket.on('board', (board)=>{
+    socket.on('board', (board, room)=>{
         // console.log('here is the new board:', board)
-        io.emit('board', board)
+        io.in("room-"+room).emit('board', board)
     })
 
-    socket.on('player', (player)=>{
+    socket.on('player', (player, room)=>{
+        
         console.log('here is the current player:', player)
         if(player === 1){
-            io.emit('player', 'Red wins!')   
+            io.in("room-"+room).emit('player', 'Red wins!')   
         }
         if(player === 2){
-            io.emit('player', 'Blue wins!')
+            io.in("room-"+room).emit('player', 'Blue wins!')
         }
         if(player === null){
-            io.emit('player', 'Draw!')
+            io.in("room-"+room).emit('player', 'Draw!')
         }
+    
     })
 
     socket.on('disconnect', function(){
