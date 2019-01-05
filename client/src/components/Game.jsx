@@ -64,6 +64,7 @@ class Game extends React.Component{
       })
     }
 
+    //conditional lobby loading
     handleLoading(){
       lobbyCheck((b)=>{
         if(b === true){
@@ -85,6 +86,7 @@ class Game extends React.Component{
         }
     }
 
+    //conditional disconnect response
     handleDisconnect(){
       disconnect((b)=>{
         this.setState({
