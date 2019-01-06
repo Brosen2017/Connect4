@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 mongoose.connect(
-  "mongodb://13.56.176.171:27017/gameDB",
+  // "mongodb://13.56.176.171:27017/gameDB", - running on same instance
+  "mongodb://54.241.140.7/gameDB", //- running on seperate instance
   {
     useMongoClient: true
   }
