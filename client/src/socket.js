@@ -5,7 +5,6 @@ const socket = io("http://52.52.218.4:1337");
 //all of the listeners and emitters for client go here
 
 function joinGame(cb) {
-  // socket.emit('join', player);
   socket.on("connectToRoom", data => {
     cb(data);
   });
@@ -33,12 +32,8 @@ function retrieveBoard(cb) {
   });
 }
 
-// function playerTrack(){
-//   socket.emit('update', socket.id)
-// }
 
 function toggle(array, room) {
-  // console.log('no socket?', socket.id)
   socket.emit("toggle", socket.id, array, room);
 }
 

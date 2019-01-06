@@ -25,7 +25,7 @@ io.on("connection", socket => {
     roomno++;
   socket.join("room-" + roomno);
 
-  //send the user room to the connected clients, push the toom into the room bucket and reset store array
+  //send the user room to the connected clients, push the room into the room bucket and reset store array
   io.sockets
     .in("room-" + roomno)
     .emit("connectToRoom", { player: store, room: +roomno });
