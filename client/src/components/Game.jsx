@@ -137,7 +137,7 @@ class Game extends React.Component {
 
   handleScore() {
     axios
-      .get("/player")
+      .get("http://13.56.176.171:5000/player")
       .then(res => {
         this.setState({
           highScore: res.data
@@ -203,7 +203,7 @@ class Game extends React.Component {
   handleWins(player) {
     if (player === this.state.player1) {
       axios
-        .get("/player")
+        .get("http://13.56.176.171:5000/player")
         .then(res => {
           if (
             res.data.length <= 0 ||
@@ -228,7 +228,7 @@ class Game extends React.Component {
             wins: this.state.wins1
           };
           axios
-            .patch("/player", { user })
+            .patch("http://13.56.176.171:5000/player", { user })
             .then(res => {
               // console.log(res.data)
             })
@@ -237,7 +237,7 @@ class Game extends React.Component {
         .catch(err => console.log(err));
     } else if (player === this.state.player2) {
       axios
-        .get("/player")
+        .get("http://13.56.176.171:5000/player")
         .then(res => {
           if (
             res.data.length <= 0 ||
@@ -262,7 +262,7 @@ class Game extends React.Component {
             wins: this.state.wins2
           };
           axios
-            .patch("/player", { user })
+            .patch("http://13.56.176.171:5000/player", { user })
             .then(res => {
               // console.log(res.data)
             })

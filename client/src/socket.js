@@ -1,5 +1,6 @@
 import io from "socket.io-client";
-const socket = io("http://localhost:1337");
+// const socket = io("http://localhost:1337");
+const socket = io("http://52.52.218.4:1337");
 
 //all of the listeners and emitters for client go here
 
