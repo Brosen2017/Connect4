@@ -1,6 +1,6 @@
 # Connect4TakeHome
 
-This Project is for a company take home project, and consists of a multiplayer connect4 game. 
+This Project is designed to simulate an online multiplayer game, and consists of real time client feedback using websockets and dynamically scalable server rooms. 
 
 You can play locally by running the local code, or play online by visiting:'' (please note, servers for online play can be turned on via request)
 
