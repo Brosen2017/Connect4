@@ -1,4 +1,4 @@
-# Connect4TakeHome
+# Connect4
 
 This Project is designed to simulate an online multiplayer game, and consists of real time client feedback using websockets and dynamically scalable server rooms. 
 
